@@ -7,9 +7,13 @@ import com.springboot.productservice.mapper.ProductsMapper;
 import com.springboot.productservice.repository.ProductsRepository;
 import com.springboot.productservice.service.ProductsService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.LoginException;
 import java.lang.module.ResolutionException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ProductsServiceImpl implements ProductsService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductsServiceImpl.class);
 
     private ProductsRepository productsRepository;
 
@@ -53,14 +59,17 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
     @Override
     public ProductsDto getProductsById(Long id) {
+        LOGGER.info("Inside getProductsById() method");
         Products products = productsRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException("The products does not exists with id: "+ id));
         return ProductsMapper.mapToProductsDto(products);
     }
 
     public ProductsDto getDefaultProducts(Long id, Exception exception) {
+        LOGGER.info("Inside getDefaultProducts() method");
         Products products = productsRepository.findById(id).get();
         Products product = new Products();
         product.setName("Item");
