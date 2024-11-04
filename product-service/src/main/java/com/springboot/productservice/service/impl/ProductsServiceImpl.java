@@ -6,6 +6,7 @@ import com.springboot.productservice.exception.ResourceNotFoundException;
 import com.springboot.productservice.mapper.ProductsMapper;
 import com.springboot.productservice.repository.ProductsRepository;
 import com.springboot.productservice.service.ProductsService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,10 +52,22 @@ public class ProductsServiceImpl implements ProductsService {
         }
     }
 
+    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
     @Override
     public ProductsDto getProductsById(Long id) {
         Products products = productsRepository.findById(id).orElseThrow(()->
                 new ResourceNotFoundException("The products does not exists with id: "+ id));
         return ProductsMapper.mapToProductsDto(products);
+    }
+
+    public ProductsDto getDefaultProducts(Long id, Exception exception) {
+        Products products = productsRepository.findById(id).get();
+        Products product = new Products();
+        product.setName("Item");
+        product.setDescription("Items");
+        product.setCategory("Tech");
+        product.setQuantity(2);
+        product.setPrice(2000.0);
+        return ProductsMapper.mapToProductsDto(product);
     }
 }
