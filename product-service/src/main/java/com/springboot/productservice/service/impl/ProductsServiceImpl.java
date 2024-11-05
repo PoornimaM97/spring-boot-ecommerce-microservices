@@ -58,7 +58,7 @@ public class ProductsServiceImpl implements ProductsService {
         }
     }
 
-    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
+    //@CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
     @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultProducts")
     @Override
     public ProductsDto getProductsById(Long id) {
