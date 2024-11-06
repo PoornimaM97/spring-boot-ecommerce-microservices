@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -46,5 +47,10 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (StripeException e) {
             throw new RuntimeException("Payment failed", e);
         }
+    }
+
+    @Override
+    public Optional<Payments> getPaymentDetails(String transactionId) {
+        return paymentRepository.findByTransactionId(transactionId);
     }
 }

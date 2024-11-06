@@ -7,8 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -18,10 +17,15 @@ public class PaymentsController {
 
     private PaymentService paymentService;
 
-    public ResponseEntity<Payments> addPayment(PaymentsDto paymentsDto){
+    @PostMapping
+    public ResponseEntity<Payments> addPayment(@RequestBody PaymentsDto paymentsDto){
         Payments payments = paymentService.processPayment(paymentsDto.getAmount(), paymentsDto.getCurrency());
         return new ResponseEntity<>(payments, HttpStatus.CREATED);
     }
 
+    public ResponseEntity<Payments> getPayment(String transactionId){
+        return paymentService.getPaymentDetails(transactionId)
+                .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 
 }
