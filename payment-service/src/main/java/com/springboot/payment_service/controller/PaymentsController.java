@@ -23,7 +23,8 @@ public class PaymentsController {
         return new ResponseEntity<>(payments, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Payments> getPayment(String transactionId){
+    @GetMapping("{transactionId}")
+    public ResponseEntity<Payments> getPayment(@PathVariable String transactionId){
         return paymentService.getPaymentDetails(transactionId)
                 .map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
