@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/payments")
 @AllArgsConstructor
-@NoArgsConstructor
 public class PaymentsController {
 
     private PaymentService paymentService;
 
     @PostMapping
     public ResponseEntity<Payments> addPayment(@RequestBody PaymentsDto paymentsDto){
+        System.out.println("1");
         Payments payments = paymentService.processPayment(paymentsDto.getAmount(), paymentsDto.getCurrency());
+        System.out.println("2");
         return new ResponseEntity<>(payments, HttpStatus.CREATED);
     }
 

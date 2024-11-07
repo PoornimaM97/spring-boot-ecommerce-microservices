@@ -8,6 +8,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+    @Autowired
     private PaymentRepository paymentRepository;
 
     @Value("${stripe.api-key}")
@@ -28,6 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payments processPayment(Double amount, String currency) {
+        System.out.println("3");
         Stripe.apiKey = stripeApiKey;
         try {
             Map<String, Object> params = new HashMap<>();
@@ -41,8 +42,9 @@ public class PaymentServiceImpl implements PaymentService {
             payments.setCurrency(currency);
             payments.setPaymentStatus(charge.getStatus());
             payments.setPaymentDate(new Date());
-
+            System.out.println("4");
             return paymentRepository.save(payments);
+
 
         } catch (StripeException e) {
             throw new RuntimeException("Payment failed", e);
